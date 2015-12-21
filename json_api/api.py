@@ -28,11 +28,21 @@ REQUESTS = {
 # The fields that appear in a request.
 REQUEST_FIELDS = ['action', 'data_type', 'payload', 'message_info']
 
+# The fields that appear in a response.
+RESPONSE_FIELDS = ['response', 'data_type', 'payload', 'message_info']
+
 # The error messages corresponding to failed requests.
 MALFORMED_REQUESTS = {
 	'JSON': 'JSON malformed.',
 	'TYPE': 'Invalid request type.',
 	'FIELDS': 'Invalid request fields.'
+}
+
+# The error messages corresponding to problematic responses.
+MALFORMED_RESPONSES = {
+	'JSON': 'JSON malformed.',
+	'TYPE': 'Invalid response type.',
+	'FIELDS': 'Invalid response fields.'
 }
 
 
@@ -84,6 +94,27 @@ def _check_request(request):
 		return _malformed_request('FIELDS')
 
 
+def _check_response(request, response):
+
+	"""Checks for problems with a received response."""
+
+	# Checks the correct response fields are present.
+	if all(field in response for field in RESPONSE_FIELDS):
+
+		action = request['action']
+		allowed_responses = list(REQUESTS[action].values()) + ['malformed-request']
+
+		# Checks the response type is permitted.
+		if (response['response'] in allowed_responses):
+			return {'success': True, 'result': request}
+
+		else:
+			return {'success': False, 'error': MALFORMED_RESPONSES['TYPE']}
+
+	else:
+		return {'success': False, 'error': MALFORMED_RESPONSES['FEILDS']}
+
+
 def response(request, success, payload=None, info=None):
 
 	"""Creates a response from an API request."""
@@ -124,9 +155,21 @@ def request(action, data_type=None, payload=None, info=None):
 		}
 
 		try:
-			return json.dumps(message)
+			return message, json.dumps(message)
 		except TypeError as err:
 			raise Exception('Problem building request: {}'.format(err))
 
 	else:
 		raise Exception('Request verb not permitted: {}'.format(action))
+
+
+def decode_response(request, response):
+
+	"""Decodes the JSON in an API response."""
+
+	try:
+		api_response = json.loads(response)
+	except json.JSONDecodeError:
+		return {'success': False, 'error': MALFORMED_RESPONSES['JSON']}
+
+	return _check_response(request, api_response)
