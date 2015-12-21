@@ -68,7 +68,7 @@ def _malformed_request(error):
 
 def _check_request(request):
 
-	"""Checks for problems with the request."""
+	"""Checks for problems with a received request."""
 
 	# Checks the correct request fields are present.
 	if all(field in request for field in REQUEST_FIELDS):
@@ -108,3 +108,25 @@ def decode_request(request):
 		return _malformed_request('JSON')
 
 	return _check_request(api_request)
+
+
+def request(action, data_type=None, payload=None, info=None):
+
+	"""Creates a JSON request."""
+
+	if action in REQUESTS:
+
+		message = {
+			'action': action,
+			'data_type': data_type,
+			'payload': payload,
+			'message_info': info
+		}
+
+		try:
+			return json.dumps(message)
+		except TypeError as err:
+			raise Exception('Problem building request: {}'.format(err))
+
+	else:
+		raise Exception('Request verb not permitted: {}'.format(action))
