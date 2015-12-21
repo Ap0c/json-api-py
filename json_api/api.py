@@ -82,3 +82,17 @@ def _check_request(request):
 
 	else:
 		return _malformed_request('FIELDS')
+
+
+def response(request, success, payload=None, info=None):
+
+	"""Creates a response from an API request."""
+
+	action = request['action']
+
+	if success:
+		response_type = REQUESTS[action]['success']
+	else:
+		response_type = REQUESTS[action]['failure']
+
+	return _build_response(response_type, request['data_type'], payload, info)
