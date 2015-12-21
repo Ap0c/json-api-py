@@ -38,7 +38,7 @@ MALFORMED_REQUESTS = {
 
 # ----- Internal Functions ----- #
 
-def _buildResponse(response, data_type=None, payload=None, info=None):
+def _build_response(response, data_type=None, payload=None, info=None):
 
 	"""Creates an API response of the correct format."""
 
@@ -55,12 +55,30 @@ def _buildResponse(response, data_type=None, payload=None, info=None):
 		raise Exception('Problem building response: {}'.format(err))
 
 
-def _malformedRequest(error):
+def _malformed_request(error):
 
 	"""Creates a response for a malformed API request."""
 
 	payload = MALFORMED_REQUESTS[error]
 
-	errRes = _buildResponse('malformed-request', payload=payload)
+	errRes = _build_response('malformed-request', payload=payload)
 
 	return {'success': False, 'err_response': errRes}
+
+
+def _check_request(request):
+
+	"""Checks for problems with the request."""
+
+	# Checks the correct request fields are present.
+	if all(field in request for field in REQUEST_FIELDS):
+
+		# Checks the request type is permitted.
+		if (request['action'] in REQUESTS):
+			return {'success': True, 'result': request}
+
+		else:
+			return _malformed_request('TYPE')
+
+	else:
+		return _malformed_request('FIELDS')
