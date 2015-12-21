@@ -1,3 +1,8 @@
+# ----- Imports ----- #
+
+import json
+
+
 # ----- Setup ----- #
 
 # The request types and their response messages.
@@ -29,3 +34,22 @@ MALFORMED_REQUESTS = {
 	'TYPE': 'Invalid request type.',
 	'FIELDS': 'Invalid request fields.'
 }
+
+
+# ----- Internal Functions ----- #
+
+def _buildResponse(response, data_type=None, payload=None, info=None):
+
+	"""Creates an API response of the correct format."""
+
+	message = {
+		'response': response,
+		'data_type': data_type,
+		'payload': payload,
+		'message_info': info
+	}
+
+	try:
+		return json.dumps(message)
+	except TypeError as err:
+		raise Exception('Problem building response: {}'.format(err))
