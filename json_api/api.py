@@ -96,3 +96,15 @@ def response(request, success, payload=None, info=None):
 		response_type = REQUESTS[action]['failure']
 
 	return _build_response(response_type, request['data_type'], payload, info)
+
+
+def decode_request(request):
+
+	"""Decodes the JSON in an API request."""
+
+	try:
+		api_request = json.loads(request)
+	except json.JSONDecodeError:
+		return _malformed_request('JSON')
+
+	return _check_request(api_request)
