@@ -53,3 +53,14 @@ def _buildResponse(response, data_type=None, payload=None, info=None):
 		return json.dumps(message)
 	except TypeError as err:
 		raise Exception('Problem building response: {}'.format(err))
+
+
+def _malformedRequest(error):
+
+	"""Creates a response for a malformed API request."""
+
+	payload = MALFORMED_REQUESTS[error]
+
+	errRes = _buildResponse('malformed-request', payload=payload)
+
+	return {'success': False, 'err_response': errRes}
