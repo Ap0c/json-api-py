@@ -133,14 +133,18 @@ def decode_request(request, parsed=False):
 
 	"""Decodes the JSON in an API request."""
 
-	if not parsed:
+	if parsed:
+
+		return _check_request(request)
+
+	else:
 
 		try:
 			api_request = json.loads(request)
 		except json.JSONDecodeError:
 			return _malformed_request('JSON')
 
-	return _check_request(api_request)
+		return _check_request(api_request)
 
 
 def request(action, data_type=None, payload=None, info=None):
