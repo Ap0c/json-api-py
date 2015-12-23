@@ -90,3 +90,38 @@ Builds a JSON-encoded API response from a given request object (Note: takes a de
 - `payload` (*optional*): A data payload of some form that is being returned as part of the response. Must be JSON-serialisable.
 
 - `info` (*optional*): Additional info about the response that, for whatever reason, does not belong in the payload. Must be JSON-serialisable.
+
+### api.request(*action*, *[data_type]*, *[payload]*, *[info]*)
+
+Builds a JSON-encoded request in the API-specified format. It requires a request action verb, but all other arguments are nullable. Returns an tuple containing the dictionary version of the request, and a JSON-encoded (stringified) copy.
+
+- `action`: A string containing one of the allowed API action verbs.
+
+- `dataType` (*optional*): A string describing the expected data type of the response.
+
+- `payload` (*optional*): A data payload of some form that is to be included as part of the request. Must be JSON-serialisable.
+
+- `info` (*optional*): Additional info about the request that, for whatever reason, does not belong in the payload. Must be JSON-serialisable.
+
+### api.decodeResponse(*request*, *response*)
+
+Takes a dictionary representing the request (the one returned by `api.request`), and its corresponding JSON-encoded response. Decodes the response and returns an dictionary specifying whether the decoding was a success, and either the decoded response or an error message.
+
+- `request`: The original request in dictionary format.
+
+- `response`: The JSON-encoded response received.
+
+Return object is either of the form:
+
+```py
+{ success: true, result: <response_object> }
+```
+
+or:
+
+```py
+{ success: false, error: <error_message> }
+```
+
+
+
